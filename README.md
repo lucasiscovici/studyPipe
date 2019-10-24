@@ -1,7 +1,7 @@
 **studyPipe: Convenient pipe in python | Pipe pratique en python**  
 Based On [sspipe/sspipe](https://github.com/sspipe/sspipe)  itself based on  [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
 Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz) (toolz.curried)  
-Based One [kieferk/dfply](https://github.com/kieferk/dfply)
+Based On [kieferk/dfply](https://github.com/kieferk/dfply)
 
 **Example: functions in the re module (regex)**  
 Without studyPipe
