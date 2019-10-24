@@ -1,6 +1,6 @@
 studyPipe: Convenient pipe in python | Pipe pratique en python  
 Based On [sspipe/sspipe](https://github.com/sspipe/sspipe)  itself based on  [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
-Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz (toolz.curried)
+Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz) (toolz.curried)
 
 Example: functions in module re (regex)  
 Without studyPipe
