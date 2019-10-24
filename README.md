@@ -49,7 +49,7 @@ config.globalsFn=lambda:globals()
 from studyPipe import __, _fn_, _ftools_
 ```
 
-**Imported pipes:**
+**Imported pipes:**  
 `px` and `p` from sspipe (also as `_px` and `_p`, also as `px_` and `p_`)  
 `X` from [kieferk/dfply](https://github.com/kieferk/dfply) (also as `_X` and `X_`)    
 dfply as `df` (also as `_df` and `df_`)  
