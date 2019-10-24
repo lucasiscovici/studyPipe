@@ -27,11 +27,42 @@ with studyPipe
 ```
 np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | _fun_.plt.plot(__, np.sin(__), 'r');
 ```
+**Exemple 2: from sspipe**  
+with sspipe
+```
+(
+  [0, pi/6, pi/2]
+  | p(map, lambda x: '{:.3f}'.format(sin(x)))
+  | p(list) 
+  | p(' '.join) 
+  | p(print, "Example 5: using builtin map transform and lambda", px)
+)
+>>> Example 5: using builtin map transform and lambda 0.000 0.500 1.000
+```
 
+with studyPipe (and without `|_fun_|`)
+```
+([0, pi/6, pi/2] 
+    | _ftools_.mapl(_fun_.str('{:.3f}').format(sin(__)))
+    | _fun_.str(" ").join
+    | _fun_.print("Example 5: using builtin map transform and lambda", __)
+)
+>>> Example 5: using builtin map transform and lambda 0.000 0.500 1.000
+```
+with studyPipe (and with `|_fun_|`)
+```
+([0, pi/6, pi/2] 
+    | _ftools_.mapl(sin(__) |_fun_| '{:.3f}'.format )
+    |_fun_| " ".join
+    | _fun_.print("Example 5: using builtin map transform and lambda", __)
+)
+>>> Example 5: using builtin map transform and lambda 0.000 0.500 1.000
+```
 
 **studyPipe's vocabulary:**  
 `__`: placeholder (px in sspipe) (two underscore)  
 `_fun_`: before a function (replace p in sspipe) (one underscore before, one underscore after)  
+`|_fun_|`: between pipes when the next element is an function (without parameters)  
 `_ftools_`: curried's functions from toolz.curried and JulienPalard/Pipe  (one underscore before, one underscore after)  
 
 **Install:**
@@ -47,7 +78,7 @@ from studyPipe import config
 config.globalsFn=lambda:globals()
 
 #Import
-from studyPipe import __, _fn_, _ftools_
+from studyPipe import __, _fun_, _ftools_
 ```
 
 **Imported pipes:**  
