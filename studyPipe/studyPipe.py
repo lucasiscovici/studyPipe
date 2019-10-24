@@ -9,7 +9,7 @@ from sspipe import p, px
 from sspipe import p as _p, px as _px
 from sspipe import p as p_, px as px_
 
-
+ 
 import dfply as df
 import dfply as _df
 import dfply as df_
@@ -34,10 +34,9 @@ class config:
     globalsFn=lambda:globals()
 
 
-
 #SOURCE: sspipe
-def _resolve(pipe, x):
-    while isinstance(pipe, Pipe):
+def _resolve(pipe, x, cls=Pipe):
+    while isinstance(pipe, cls):
         pipe = pipe._____func___(x)
     return pipe
 
@@ -92,25 +91,163 @@ Pipe2.__rmod__=Pipe2.__ror__
 def has_method(o, name):
     return name in dir(o)
 
+#patch for Pipe, Pipe2, placeholder
+def _patch_cls_method(cls, method):
+    original = getattr(cls, method)
+
+    @functools.wraps(original)
+    def wrapper(self, x, *args, **kwargs):
+        # if placeholderFn(x) or placeholder(x):
+        #     return NotImplemented
+        if isinstance(x, Pipe) or  isinstance(x, Pipe2) or isinstance(x,placeholder)  or  isinstance(x, placeholder2):
+            return NotImplemented
+        return original(self, x, *args, **kwargs)
+
+    setattr(cls, method, wrapper)
+
+
+def patch_cls_operator(cls):
+    _patch_cls_method(cls, '__or__')
+
+def patch_all2():
+    try:
+        import pandas
+
+        patch_cls_operator(pandas.Series)
+        patch_cls_operator(pandas.DataFrame)
+        patch_cls_operator(pandas.Index)
+    except ImportError:
+        pass
+
+    try:
+        import torch
+
+        patch_cls_operator(torch.Tensor)
+    except ImportError:
+        pass
+
 class placeholder:
-    def __init__(self,p=Pipe,calla=False):
+    def __init__(self,calla=False,func=lambda x,f=None:f(x) if f is not None else x):
         self.calla=calla
-        self.p=p
+        self.func = func
     def __getattr__(self,a):
         global config
         g=config.globalsFn
         if a in g():
             # if self.calla and callable( g()[a]):
             #     return sspipe.p( g()[a])
-            return self.p(lambda x: g()[a])
+            return Pipe(lambda x: g()[a])
         if has_method(builtins,a):
             # if self.calla and callable(getattr(builtins,a)):
             #     return sspipe.p( getattr(builtins,a))
-            return self.p(lambda x:getattr(builtins,a))
+            return Pipe(lambda x:getattr(builtins,a))
         return None
 
+    @staticmethod
+    def __array_ufunc__(func, method, *args, **kwargs):
+        import numpy
+        if callable(method) and args[0] == '__call__':
+            # print(args[2].__class__.__name__)
+            if method is numpy.bitwise_or:
+                if isinstance(args[1], Pipe):
+                    return Pipe.partial(_resolve, args[2], args[1])
+                elif isinstance(args[1], Pipe2):
+                    return Pipe2.partial(_resolve, args[2], args[1])
+                elif isinstance(args[2], placeholder):
+                    return args[2].__ror__(args[1])
+                else:
+                    return _resolve(args[2], args[1],Pipe)
+            return Pipe.partial(method, *args[1:], **kwargs)
+        elif method == '__call__':
+            if func.name == 'bitwise_or':
+                if isinstance(args[0], Pipe):
+                    return Pipe.partial(_resolve, args[1], args[0])
+                elif isinstance(args[0], Pipe2):
+                    return Pipe2.partial(_resolve, args[1], args[0])
+                elif isinstance(args[1], placeholder):
+                    return args[1].__ror__(args[0])
+                else:
+                    return _resolve(args[1], args[0],Pipe)
+            return Pipe.partial(func, *args, **kwargs)
+        return NotImplemented
+
+    def __or__(self, other):
+        return self.func(other)
+
+    def __ror__(self, other):
+        return placeholder(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe) else self.func(other, x))
+
+    def __mod__(self, other):
+        return self.func(other)
+
+    def __rmod__(self, other):
+        return placeholder(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe) else self.func(other, x))
+
+class placeholder2:
+    def __init__(self,calla=False,func=lambda x,f=None:f(x) if f is not None else x):
+        self.calla=calla
+        self.func = func
+    def __getattr__(self,a):
+        global config
+        g=config.globalsFn
+        if a in g():
+            # if self.calla and callable( g()[a]):
+            #     return sspipe.p( g()[a])
+            return Pipe2(lambda x: g()[a])
+        if has_method(builtins,a):
+            # if self.calla and callable(getattr(builtins,a)):
+            #     return sspipe.p( getattr(builtins,a))
+            return Pipe2(lambda x:getattr(builtins,a))
+        return None
+
+    @staticmethod
+    def __array_ufunc__(func, method, *args, **kwargs):
+        import numpy
+        if callable(method) and args[0] == '__call__':
+            # print(args[2].__class__.__name__)
+            if method is numpy.bitwise_or:
+                if isinstance(args[1], Pipe):
+                    return Pipe.partial(_resolve, args[2], args[1])
+                elif isinstance(args[1], Pipe2):
+                    return Pipe2.partial(_resolve, args[2], args[1])
+                elif isinstance(args[2], placeholder):
+                    return args[2].__ror__(args[1])
+                elif isinstance(args[1], placeholder2):
+                    return args[1].__ror__(args[0])
+                else:
+                    return _resolve(args[2], args[1],Pipe2)
+            return Pipe2.partial(method, *args[1:], **kwargs)
+        elif method == '__call__':
+            if func.name == 'bitwise_or':
+                if isinstance(args[0], Pipe):
+                    return Pipe.partial(_resolve, args[1], args[0])
+                elif isinstance(args[0], Pipe2):
+                    return Pipe2.partial(_resolve, args[1], args[0])
+                elif isinstance(args[1], placeholder):
+                    return args[1].__ror__(args[0])
+                elif isinstance(args[1], placeholder2):
+                    return args[1].__ror__(args[0])
+                else:
+                    return _resolve(args[1], args[0],Pipe2)
+            return Pipe2.partial(func, *args, **kwargs)
+        return NotImplemented
+
+    def __or__(self, other):
+        return self.func(other)
+
+    def __ror__(self, other):
+        return placeholder2(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe2) else self.func(other, x))
+
+    def __mod__(self, other):
+        return self.func(other)
+
+    def __rmod__(self, other):
+        return placeholder2(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe2) else self.func(other, x))
+
+
+patch_all2()
 _fun_=placeholder()
-__fun__=placeholder(p=Pipe2) #with no curryMe
+__fun__=placeholder2() #with no curryMe
 # ____=placeholder(calla=T)
 
 
