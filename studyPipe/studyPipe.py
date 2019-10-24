@@ -122,7 +122,7 @@ class opy: pass
 oo=['accumulate',  'assoc',  'assoc_in',  'comp',  'complement',  'compose',  'concat',  'concatv',  'cons',  'count',  'countby',  'curry',  'diff',  'dissoc',  'do',  'drop',  'excepts',  'filter',  'first',  'flip',  'frequencies',  'get',  'get_in',  'groupby',  'identity',  'interleave',  'interpose',  'isdistinct',  'isiterable',  'itemfilter',  'itemmap',  'iterate',  'join',  'juxt',  'keyfilter',  'keymap',  'last',  'map',  'mapcat',  'memoize',  'merge',  'merge_sorted',  'merge_with',  'nth',  'operator',  'partial',  'partition',  'partition_all',  'partitionby',  'peek',  'pipe',  'pluck',  'random_sample',  'reduce',  'reduceby',  'remove',  'second',  'sliding_window',  'sorted',  'tail',  'take',  'take_nth',  'thread_first',  'thread_last',  'topk',  'unique',  'update_in',  'valfilter',  'valmap']
 
 for i in oo:
-    setattr(opy,i,convert_pipe(getattr(__c,i)))
+    setattr(opy,i,convert_pipe(getattr(_c,i)))
 
 
 #### list(map, zip, filter, range) 
@@ -141,7 +141,7 @@ def rangel(*args):
 toA=[mapl,zipl,filterl,rangel]
 
 for i in toA:
-    setattr(opy,i.__name__,convert_pipe(__c.curry(i)))
+    setattr(opy,i.__name__,convert_pipe(_c.curry(i)))
 
 #### add Pipe functions from JulienPalard
 r=dir(_p) | _p.where( _fun_.re.match("^[^_]") ) | _p.as_list()
