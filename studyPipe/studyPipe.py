@@ -81,7 +81,7 @@ def call_curry(self, *args, **kwargs):
 
 
 Pipe.__ror__=ror_callable
-Pipe.__call__ = curryMe
+Pipe.__call__ = call_curry
 Pipe.__rmod__=Pipe.__ror__
 
 #with no curryMe
