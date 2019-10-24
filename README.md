@@ -2,7 +2,7 @@
 Based On [sspipe/sspipe](https://github.com/sspipe/sspipe)  itself based on  [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
 Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz) (toolz.curried)
 
-**Example: functions in the re module (regex)** 
+**Example: functions in the re module (regex)**  
 Without studyPipe
 
 ```
@@ -15,7 +15,7 @@ With studyPipe
 dir(re) | _ftools_.map(  __.lower() ) | _ftools_.filterl( _fun_.re.match("^[^_]") )
 ```
 
-**Example: from sspipe**
+**Example: from sspipe**  
 
 ```
 np.linspace(0, 2*np.pi, 100) | px[np.cos(px) < 0] | p(plt.plot, px, np.sin(px), 'r')
