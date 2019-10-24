@@ -51,8 +51,8 @@ from studyPipe import __, _fn_, _ftools_
 
 **Imported pipes:**
 `px` and `p` from sspipe (also as `_px` and `_p`, also as `px_` and `p_`)  
-`X` from [kieferk/dfply](https://github.com/kieferk/dfply) (also as `_X` and `X_`)  
+`X` from [kieferk/dfply](https://github.com/kieferk/dfply) (also as `_X` and `X_`)    
 dfply as `df` (also as `_df` and `df_`)  
-`curried` from toolz (also as `_c` or `c_`)
-`T` and `F`: for True and False
+`curried` from toolz (also as `_c` or `c_`)  
+`T` and `F`: for True and False  
 
