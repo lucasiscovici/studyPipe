@@ -29,12 +29,14 @@ np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | _fun_.plt.plot(__, np.sin(__
 
 
 **studyPipe's vocabulary:**  
-`__`: placeholder (px in sspipe) (two underscore)
-`_fun_`: before a function (replace p in sspipe) (one underscore before, one underscore after)
-`_ftools_`: curried's functions from toolz.curried and JulienPalard/Pipe  (one underscore before, one underscore after)
+`__`: placeholder (px in sspipe) (two underscore)  
+`_fun_`: before a function (replace p in sspipe) (one underscore before, one underscore after)  
+`_ftools_`: curried's functions from toolz.curried and JulienPalard/Pipe  (one underscore before, one underscore after)  
 
 **Install:**
+```
 pip install git+https://github.com/luluperet/studyPipe.git
+```
 
 
 **Usage:**
