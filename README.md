@@ -1,6 +1,7 @@
 **studyPipe: Convenient pipe in python | Pipe pratique en python**  
 Based On [sspipe/sspipe](https://github.com/sspipe/sspipe)  itself based on  [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
-Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz) (toolz.curried)
+Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz) (toolz.curried)  
+Based One [kieferk/dfply](https://github.com/kieferk/dfply)
 
 **Example: functions in the re module (regex)**  
 Without studyPipe
@@ -51,7 +52,7 @@ from studyPipe import __, _fn_, _ftools_
 
 **Imported pipes:**  
 `px` and `p` from sspipe (also as `_px` and `_p`, also as `px_` and `p_`)  
-`X` from [kieferk/dfply](https://github.com/kieferk/dfply) (also as `_X` and `X_`)    
+`X` from dfply (also as `_X` and `X_`)    
 dfply as `df` (also as `_df` and `df_`)  
 `curried` from toolz (also as `_c` or `c_`)  
 `T` and `F`: for True and False  
