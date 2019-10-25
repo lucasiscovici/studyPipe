@@ -242,7 +242,7 @@ from studyPipe import config
 config.globalsFn=lambda:globals() # Alow studyPipe to know your variables, modules, ....
 
 #Import
-from studyPipe import __, _fun_, _funs_, _ftools_ #placeholder
+from studyPipe import __, _fun_, _funs_, _ftools_, _funsInv_
 ```
 
 ## Imported pipes:  
