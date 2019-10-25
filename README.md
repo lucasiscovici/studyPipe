@@ -112,7 +112,7 @@ with studyPipe (and with `|_fun_|`)
 - More on: [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
 - More on: [/pytoolz/toolz](https://github.com/pytoolz/toolz)  
 
-`|_funs_|`: between pipes when the next element is a function and you want to expand an iterable as function's parameters  (next function without parameters)  
+`|_funs_|`:  when the next element is a function and you want to expand an iterable as function's parameters  (next function without parameters)  
 ```python
 (
     [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]]  
@@ -140,6 +140,28 @@ same as
 >>> HELLO : 0, 1, 2, 3, 4 (sum: 10)
 ... WORLD : 5, 6, 7, 8 (sum: 26)
 ```
+`|_funsInv_|` : when the next element is an iterable and you want to expand them as function's parameters (the element before is a function without parameters)
+```python
+(
+    os.listdir() 
+    | _ftools_.where(__.endswith(".py")) 
+    | _ftools_.sorted(key=len)
+    | _ftools_.enumerate(__)
+    | _ftools_.mapl( "{}. {}".format |_funsInv_|  __ )  
+    | _ftools_.join("\n") 
+    | _fun_.print
+)
+#OR
+(
+    os.listdir() 
+    | _ftools_.where(__.endswith(".py")) 
+    | _ftools_.sorted(key=len)
+    | _ftools_.enumerate(__)
+    | _ftools_.mapl( "{}. {}" )  
+    | _ftools_.join("\n") 
+    | _fun_.print
+)
+```
 
 ## Install:
 ```
@@ -166,7 +188,26 @@ dfply as `df` (also as `_df` and `df_`)
 
 ## Curried Functions
 All functions available in JulienPalard/Pipe have a twin function that calls the list function on the result of the original function: theses functions ends by `l`  
-`wherel`, `mapl`, `filterl`, `rangel`, ....
+`wherel`, `selectl`, ....  
+More: mapl, zipl, filterl, rangel, enumeratel, sorted, join
 
 ## Comments 
-when `_funs_` is not between pipes (`|_funs_|`), it act same as `_fun_`. The only difference between `_fun_` and `_funs` it's when they are between pipes, otherwise they are the same 
+when `_funs_`(`_funsInv_`) is not between pipes (`|_funs_|`, `|_funsInv_|`), it act same as `_fun_`. The only difference between `_fun_` and `_funs` (`_funsInv`) it's when they are between pipes, otherwise they are the same   
+
+When `__` is alone before `|_funs_|` they are some  problems..., you have to use `|_funsInv_|`
+Ex (with `|_funs_|`):
+```python 
+(
+    [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]]  
+    | _ftools_.mapl( __ |_funs_| "{} : {} ".format ) 
+)
+>>> [<sspipe.pipe.Pipe at 0x7fa233c63618>, <sspipe.pipe.Pipe at 0x7fa233c63348>]
+```
+(with `|_funsInv_|`)
+```python 
+(
+    [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]]  
+    | _ftools_.mapl(  "{} : {} ".format |_funsInv_| __ ) 
+)
+>>> ['Hello : [0, 1, 2, 3, 4] ', 'World : [5, 6, 7, 8] ']
+```
