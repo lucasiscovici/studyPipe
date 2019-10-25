@@ -74,8 +74,8 @@ with studyPipe (and with `|_fun_|`)
 `_fun_`: before a function (replace p in sspipe) (one underscore before, one underscore after)  
   - ```python 
       "Hello World" | _fun_.print  
-      (same as `print("Hello World")
-      ``` )  
+      ```   
+      (same as `print("Hello World")  
   - ```python 
       "Hello World" | _fun_.print(__,end=' !!!!\n')
     ```    
@@ -101,13 +101,13 @@ with studyPipe (and with `|_fun_|`)
   
 `_ftools_`: curried's functions from toolz.curried and JulienPalard/Pipe  (one underscore before, one underscore after)   
   - ```python 
-          ["Helloee","World", "blablabla"] | _ftools_.mapl( __ |_fun_| len )
-        ```  
-        (same as `list(map(len,["Helloee","World", "blablabla"]))`) 
+      ["Helloee","World", "blablabla"] | _ftools_.mapl( __ |_fun_| len )
+      ```
+      (same as `list(map(len,["Helloee","World", "blablabla"]))`)  
   - ```python 
-          ["Helloee","World", "blablabla", "dd", "22h"] | _ftools_.filterl( __ |_fun_| len > 4 )
-          ```  
-          (same as `list(filter(lambda x:len(x) > 4,["Helloee","World", "blablabla", "dd", "22h"]))`) 
+      ["Helloee","World", "blablabla", "dd", "22h"] | _ftools_.filterl( __ |_fun_| len > 4 )
+     ```  
+     (same as `list(filter(lambda x:len(x) > 4,["Helloee","World", "blablabla", "dd", "22h"]))`) 
 - More on: [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
 - More on: [/pytoolz/toolz](https://github.com/pytoolz/toolz)  
 
