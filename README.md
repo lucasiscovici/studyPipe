@@ -74,6 +74,13 @@ with studyPipe (and with `|_fun_|`)
     |_fun_| " ".join
     | _fun_.print("Example 5: using builtin map transform and lambda", __)
 )
+#OR
+([0, pi/6, pi/2] 
+    | _ftools_.mapl( sin(__) )
+    | _ftools_.format('{:.3f}')
+    | _ftools_.join(" ")
+    | _fun_.print("Example 5: using builtin map transform and lambda", __)
+)
 >>> Example 5: using builtin map transform and lambda 0.000 0.500 1.000
 ```
 
