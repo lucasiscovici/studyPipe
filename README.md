@@ -42,8 +42,8 @@ with studyPipe
 np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | _fun_.plt.plot(__, np.sin(__), 'r');
 #OR
 np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | ((__, np.sin(__), 'r') |_funs_| plt.plot);
-#OR with dfply
-
+#OR
+np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | ( plt.plot |_funsInv_| (__, np.sin(__), 'r') );
 ```
 **Exemple 2: from sspipe**  
 with sspipe
