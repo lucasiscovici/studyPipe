@@ -6,13 +6,13 @@ Based On [kieferk/dfply](https://github.com/kieferk/dfply)
 **Example: functions in the re module (regex)**  
 Without studyPipe
 
-```
+```python
 import re
 list(filter(lambda e:re.match("^[^_]",e),map(str.lower,dir(re))))
 ```
 
 With studyPipe
-```
+```python
 dir(re) | _ftools_.map(  __.lower() ) | _ftools_.filterl( _fun_.re.match("^[^_]") )
 #OR
 re |_fun_| dir | _ftools_.map(  __.lower() ) | _ftools_.filterl(("^[^_]",__) |_funs_| re.match )
@@ -20,13 +20,13 @@ re |_fun_| dir | _ftools_.map(  __.lower() ) | _ftools_.filterl(("^[^_]",__) |_f
 
 **Example: from sspipe**  
 
-```
+```python
 np.linspace(0, 2*np.pi, 100) | px[np.cos(px) < 0] | p(plt.plot, px, np.sin(px), 'r')
 ```
 
 with studyPipe
 
-```
+```python
 np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | _fun_.plt.plot(__, np.sin(__), 'r');
 #OR
 np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | ((__, np.sin(__), 'r') |_funs_| plt.plot);
@@ -35,7 +35,7 @@ np.linspace(0, 2*np.pi, 100) | __[np.cos(__) < 0] | ((__, np.sin(__), 'r') |_fun
 ```
 **Exemple 2: from sspipe**  
 with sspipe
-```
+```python
 (
   [0, pi/6, pi/2]
   | p(map, lambda x: '{:.3f}'.format(sin(x)))
@@ -47,7 +47,7 @@ with sspipe
 ```
 
 with studyPipe (and without `|_fun_|`)
-```
+```python
 ([0, pi/6, pi/2] 
     | _ftools_.mapl(_fun_.str('{:.3f}').format(sin(__)))
     | _fun_.str(" ").join
@@ -56,7 +56,7 @@ with studyPipe (and without `|_fun_|`)
 >>> Example 5: using builtin map transform and lambda 0.000 0.500 1.000
 ```
 with studyPipe (and with `|_fun_|`)
-```
+```python
 ([0, pi/6, pi/2] 
     | _ftools_.mapl(sin(__) |_fun_| '{:.3f}'.format )
     |_fun_| " ".join
@@ -67,26 +67,51 @@ with studyPipe (and with `|_fun_|`)
 
 **studyPipe's vocabulary:**  
 `__`: placeholder (px in sspipe) (two underscore)  
-   - `np.array(range(100)) | (__-__.mean())/__.std()`  
+   - ```python 
+       np.array(range(100)) | (__-__.mean())/__.std()
+       ``` 
    
 `_fun_`: before a function (replace p in sspipe) (one underscore before, one underscore after)  
-  - `"Hello World" | _fun_.print`  (same as `print("Hello World")`)  
-  - `"Hello World" | _fun_.print(__,end=' !!!!\n')`   (same as `print("Hello World",end=' !!!!\n')`)  
-  - `"Hello World" | _fun_.print(__.lower(),end='!' * _fun_.len(__) + '\n')` (same as `print("Hello World".lower(),end='!' * len("Hello World") + '\n')`)  
+  - ```python 
+      "Hello World" | _fun_.print  
+      (same as `print("Hello World")
+      ``` )  
+  - ```python 
+      "Hello World" | _fun_.print(__,end=' !!!!\n')
+    ```    
+    (same as `print("Hello World",end=' !!!!\n')`)  
+  - ```python 
+    "Hello World" | _fun_.print(__.lower(),end='!' * _fun_.len(__) + '\n')
+    ```  
+    (same as `print("Hello World".lower(),end='!' * len("Hello World") + '\n')`)  
   
 `|_fun_|`: between pipes when the next element is an function (without parameters)    
-  - `"Hello World" |_fun_| print`  (same as `print("Hello World")`)  
-  - `"studyPipe" |_fun_| "Hello World {} !!".format |_fun_| print`  (same as `print("Hello World {} !!".format("studyPipe"))`) 
-  - ` __ |_fun_| "Hello World {} !!".format |_fn_| print` (same as `lambda x: print("Hello World {} !!".format(x))`)  
+  - ```python 
+    "Hello World" |_fun_| print
+    ```   
+    (same as `print("Hello World")`)  
+  - ```python 
+    "studyPipe" |_fun_| "Hello World {} !!".format |_fun_| print
+    ```   
+    (same as `print("Hello World {} !!".format("studyPipe"))`) 
+  - ```python 
+      __ |_fun_| "Hello World {} !!".format |_fn_| print
+      ```  
+      (same as `lambda x: print("Hello World {} !!".format(x))`)  
   
 `_ftools_`: curried's functions from toolz.curried and JulienPalard/Pipe  (one underscore before, one underscore after)   
-- `["Helloee","World", "blablabla"] | _ftools_.mapl( __ |_fun_| len )` (same as `list(map(len,["Helloee","World", "blablabla"]))`) 
-- `["Helloee","World", "blablabla", "dd", "22h"] | _ftools_.filterl( __ |_fun_| len > 4 )` (same as `list(filter(lambda x:len(x) > 4,["Helloee","World", "blablabla", "dd", "22h"]))`) 
+- ```python 
+        ["Helloee","World", "blablabla"] | _ftools_.mapl( __ |_fun_| len )
+      ``` 
+      (same as `list(map(len,["Helloee","World", "blablabla"]))`) 
+- ```python 
+        ["Helloee","World", "blablabla", "dd", "22h"] | _ftools_.filterl( __ |_fun_| len > 4 )``` 
+        (same as `list(filter(lambda x:len(x) > 4,["Helloee","World", "blablabla", "dd", "22h"]))`) 
 - More on: [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
 - More on: [/pytoolz/toolz](https://github.com/pytoolz/toolz)  
 
 `|_funs_|`: between pipes when the next element is a function and you want to expand an iterable as function's parameters  (next function without parameters)  
--`
+-```python
 (
     [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]]  
     | _ftools_.mapl((  __[0].upper(), 
@@ -96,9 +121,9 @@ with studyPipe (and with `|_fun_|`)
                    ) 
     |_fun_| '\n'.join |_fun_|  print
 )
-`
+```
 same as 
-`
+```python
 print(
     '\n'.join(
         map(lambda x:"{} : {} (sum: {})".format(x[0].upper(),
@@ -108,7 +133,7 @@ print(
            )
     )
 )
-`
+```
 
 **Install:**
 ```
@@ -120,10 +145,10 @@ pip install git+https://github.com/luluperet/studyPipe.git
 ```
 #Configuration:  
 from studyPipe import config
-config.globalsFn=lambda:globals()
+config.globalsFn=lambda:globals() # Alow studyPipe to know your variables, modules, ....
 
 #Import
-from studyPipe import __, _fun_, _ftools_
+from studyPipe import __, _fun_, _funs_, _ftools_ #placeholder
 ```
 
 **Imported pipes:**  
@@ -136,3 +161,6 @@ dfply as `df` (also as `_df` and `df_`)
 **Curried Functions**  
 All functions available in JulienPalard/Pipe have a twin function that calls the list function on the result of the original function: theses functions ends by `l`  
 `wherel`, `mapl`, `filterl`, `rangel`, ....
+
+**Comments**
+when `_funs_` is not between pipes (`|_funs_|`), it act same as `_fun_`. The only difference between `_fun_` and `_funs` it's when they are between pipes, otherwise they are the same 
