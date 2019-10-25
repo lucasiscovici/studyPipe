@@ -1,4 +1,5 @@
-**studyPipe: Convenient pipe in python | Pipe pratique en python**  
+# studyPipe: Convenient pipe in python | Pipe pratique en python
+
 Based On [sspipe/sspipe](https://github.com/sspipe/sspipe)  itself based on  [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
 Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz) (toolz.curried)  
 Based On [kieferk/dfply](https://github.com/kieferk/dfply)
@@ -65,7 +66,7 @@ with studyPipe (and with `|_fun_|`)
 >>> Example 5: using builtin map transform and lambda 0.000 0.500 1.000
 ```
 
-**studyPipe's vocabulary:**  
+## studyPipe's vocabulary:  
 `__`: placeholder (px in sspipe) (two underscore)  
    - ```python 
        np.array(range(100)) | (__-__.mean())/__.std()
@@ -140,13 +141,13 @@ same as
 ... WORLD : 5, 6, 7, 8 (sum: 26)
 ```
 
-**Install:**
+## Install:
 ```
 pip install git+https://github.com/luluperet/studyPipe.git
 ```
 
 
-**Usage:**
+## Usage:
 ```
 #Configuration:  
 from studyPipe import config
@@ -156,16 +157,16 @@ config.globalsFn=lambda:globals() # Alow studyPipe to know your variables, modul
 from studyPipe import __, _fun_, _funs_, _ftools_ #placeholder
 ```
 
-**Imported pipes:**  
+## Imported pipes:  
 `px` and `p` from sspipe (also as `_px` and `_p`, also as `px_` and `p_`)  
 `X` from dfply (also as `_X` and `X_`)    
 dfply as `df` (also as `_df` and `df_`)  
 `curried` from toolz (also as `_c` or `c_`)  
 `T` and `F`: for True and False  
 
-**Curried Functions**  
+## Curried Functions
 All functions available in JulienPalard/Pipe have a twin function that calls the list function on the result of the original function: theses functions ends by `l`  
 `wherel`, `mapl`, `filterl`, `rangel`, ....
 
-**Comments**  
+## Comments 
 when `_funs_` is not between pipes (`|_funs_|`), it act same as `_fun_`. The only difference between `_fun_` and `_funs` it's when they are between pipes, otherwise they are the same 
