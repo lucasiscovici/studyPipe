@@ -140,7 +140,7 @@ same as
 >>> HELLO : 0, 1, 2, 3, 4 (sum: 10)
 ... WORLD : 5, 6, 7, 8 (sum: 26)
 ```
-`|_funsInv_|` : when the next element is an iterable and you want to expand them as function's parameters (the element before is a function without parameters)
+`|_funsInv_|` : when the next element is an **iterable** (tuple, list, ...) and you want to expand them as function's parameters (the element before is a function without parameters)
 ```python
 (
     os.listdir() 
@@ -171,6 +171,44 @@ same as
     | _ftools_.join_n
     | _fun_.print
 )
+>>> 0. 03_classification_script.py
+... 1. 06_decision_trees_script.py
+... 2. 03_classification-Copy1_script.py
+... 3. 04_training_linear_models_script.py
+... 4. 01_the_machine_learning_landscape_script.py
+... 5. 02_end_to_end_machine_learning_project_script.py
+... 6. 07_ensemble_learning_and_random_forests_script.py
+... 7. 07_ensemble_learning_and_random_forests_modif_script.py
+```
+
+```python
+(
+    os.listdir() 
+    | _ftools_.where(__.endswith(".py")) 
+    | _ftools_.sorted(key=len)
+    | _ftools_.enumerate
+    | _ftools_.mapl( "{}. {} ({})".format |_funsInv_| (__[0], __[1], len |_funsInv_| (__[1],) ) )  
+    | _ftools_.join_n
+    | _fun_.print
+)
+#OR
+(
+    os.listdir() 
+    | _ftools_.where(__.endswith(".py")) 
+    | _ftools_.sorted(key=len)
+    | _ftools_.enumerate
+    | _ftools_.mapl( "{}. {} ({})".format |_funsInv_| ( __[0], __[1], _fun_.len(__[1]) ))  
+    | _ftools_.join_n
+    | _fun_.print
+)
+>>> 0. 03_classification_script.py (27)
+... 1. 06_decision_trees_script.py (27)
+... 2. 03_classification-Copy1_script.py (33)
+... 3. 04_training_linear_models_script.py (35)
+... 4. 01_the_machine_learning_landscape_script.py (43)
+... 5. 02_end_to_end_machine_learning_project_script.py (48)
+... 6. 07_ensemble_learning_and_random_forests_script.py (49)
+... 7. 07_ensemble_learning_and_random_forests_modif_script.py (55)
 ```
 
 ## Install:
