@@ -83,6 +83,7 @@ Pipe.__ror__=ror_callable
 Pipe.__call__ = call_curry
 Pipe.__rmod__=Pipe.__ror__
 
+
 #with no curryMe
 Pipe2.__ror__=ror_callable 
 Pipe2.__rmod__=Pipe2.__ror__
@@ -179,13 +180,13 @@ class placeholder:
         return self.func(other)
 
     def __ror__(self, other):
-        return placeholder(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe) else self.func(other, x))
-
+        return placeholder2(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe2) else self.func(other, x))
+    
     def __mod__(self, other):
-        return self.func(other)
+        return self.__or__(other)
 
     def __rmod__(self, other):
-        return placeholder(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe) else self.func(other, x))
+        return self.__ror__(other)
 
 class placeholder2:
     def __init__(self,calla=False,func=lambda x,f=None:f(x) if f is not None else x):
@@ -243,13 +244,23 @@ class placeholder2:
         return placeholder2(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe2) else self.func(other, x))
 
     def __mod__(self, other):
-        return self.func(other)
+        return self.__or__(other)
 
     def __rmod__(self, other):
-        return placeholder2(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe2) else self.func(other, x))
+        return self.__ror__(other)
+
+def iterable(a):
+    try:
+        (x for x in a)
+        return True
+    except TypeError:
+        return False
+
+def curryX(x,f=None):
+    return (Pipe.partial(lambda o:f(*o),x) if isinstance(x,Pipe) else f(x)) if f is not None else x
 
 class placeholder3:
-    def __init__(self,calla=False,func=lambda x,f=None,*otherc=[],**others={}:f(x,*otherc,**others) if f is not None else x):
+    def __init__(self,calla=False,func=curryX):
         self.calla=calla
         self.func = func
     def __getattr__(self,a):
@@ -280,7 +291,7 @@ class placeholder3:
                 elif isinstance(args[2], placeholder2):
                     return args[2].__ror__(args[1])
                 elif isinstance(args[2], placeholder3):
-                    return args[2].__ror__(args[1])
+                    return args[2].__ror__(args[1],okO=True)
                 else:
                     return _resolve(args[2], args[1],Pipe)
             return Pipe.partial(method, *args[1:], **kwargs)
@@ -295,7 +306,7 @@ class placeholder3:
                 elif isinstance(args[1], placeholder2):
                     return args[1].__ror__(args[0])
                 elif isinstance(args[1], placeholder3):
-                    return args[1].__ror__(args[0])
+                    return args[1].__ror__(args[0],okO=True)
                 else:
                     return _resolve(args[1], args[0],Pipe)
             return Pipe.partial(func, *args, **kwargs)
@@ -304,14 +315,22 @@ class placeholder3:
     def __or__(self, other):
         return self.func(other)
 
-    def __ror__(self,other,*args,**xargs):
-        return placeholder3(func=lambda x, self=self,other=other, otherc=args,others=xargs: x.__ror__(other,*otherc,**others) if isinstance(other,Pipe) else self.func(other, x,*otherc,**others))
+    def __ror__(self,other, okO=False):
+        if iterable(other):
+            other=Pipe.collection(other)
+
+        return placeholder3(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(other, x))
 
     def __mod__(self, other):
-        return self.func(other)
+        return self.__or__(other)
 
     def __rmod__(self, other):
-        return placeholder3(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe) else self.func(other, x))
+        return self.__ror__(other)
+
+# def rorFuns(lambda x,self,other):
+#     if isinstance(other,Pipe):
+
+#         pass
 
 patch_all2()
 _fun_=placeholder()
@@ -343,6 +362,7 @@ def filterl(*args):
 def rangel(*args):
     return list(range(*args))
 
+
 toA=[mapl,zipl,filterl,rangel]
 
 for i in toA:
@@ -358,4 +378,13 @@ for i in r:
         i2=i+"2"
     setattr(opy,i2,met)
 
+#### add Pipe functions from JulienPalard
+u=oo+mapl(lambda a:a.__name__,toA)
+for i in r:
+    met=getattr(_p,i)
+    ij=i+"l"
+    i2=ij
+    if ij in u:
+        continue
+    setattr(opy,i2,lambda self,x,met=met: Pipe.partial(list,met(x)) )
 _ftools_=opy()
