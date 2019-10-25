@@ -105,35 +105,36 @@ with studyPipe (and with `|_fun_|`)
       ``` 
       (same as `list(map(len,["Helloee","World", "blablabla"]))`) 
 - ```python 
-        ["Helloee","World", "blablabla", "dd", "22h"] | _ftools_.filterl( __ |_fun_| len > 4 )``` 
+        ["Helloee","World", "blablabla", "dd", "22h"] | _ftools_.filterl( __ |_fun_| len > 4 )
+      ``` 
         (same as `list(filter(lambda x:len(x) > 4,["Helloee","World", "blablabla", "dd", "22h"]))`) 
 - More on: [JulienPalard/Pipe](https://github.com/JulienPalard/Pipe)  
 - More on: [/pytoolz/toolz](https://github.com/pytoolz/toolz)  
 
 `|_funs_|`: between pipes when the next element is a function and you want to expand an iterable as function's parameters  (next function without parameters)  
--```python
-(
-    [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]]  
-    | _ftools_.mapl((  __[0].upper(), 
-                       __[1] | _ftools_.concat2(', '),
-                       __[1] |_fun_| sum  ) 
-                    |_funs_| "{} : {} (sum: {})".format
-                   ) 
-    |_fun_| '\n'.join |_fun_|  print
-)
-```
-same as 
-```python
-print(
-    '\n'.join(
-        map(lambda x:"{} : {} (sum: {})".format(x[0].upper(),
-                                                ', '.join(map(str,x[1])),
-                                                sum(x[1])),
-            [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]] 
-           )
-    )
-)
-```
+- ```python
+      (
+          [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]]  
+          | _ftools_.mapl((  __[0].upper(), 
+                             __[1] | _ftools_.concat2(', '),
+                             __[1] |_fun_| sum  ) 
+                          |_funs_| "{} : {} (sum: {})".format
+                         ) 
+          |_fun_| '\n'.join |_fun_|  print
+      )
+      ```
+      same as 
+      ```python
+      print(
+          '\n'.join(
+              map(lambda x:"{} : {} (sum: {})".format(x[0].upper(),
+                                                      ', '.join(map(str,x[1])),
+                                                      sum(x[1])),
+                  [["Hello",[0,1,2,3,4]], ["World",[5,6,7,8]]] 
+                 )
+          )
+      )
+      ```
 
 **Install:**
 ```
@@ -162,5 +163,5 @@ dfply as `df` (also as `_df` and `df_`)
 All functions available in JulienPalard/Pipe have a twin function that calls the list function on the result of the original function: theses functions ends by `l`  
 `wherel`, `mapl`, `filterl`, `rangel`, ....
 
-**Comments**
+**Comments**  
 when `_funs_` is not between pipes (`|_funs_|`), it act same as `_fun_`. The only difference between `_fun_` and `_funs` it's when they are between pipes, otherwise they are the same 
