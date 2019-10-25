@@ -146,7 +146,7 @@ same as
     os.listdir() 
     | _ftools_.where(__.endswith(".py")) 
     | _ftools_.sorted(key=len)
-    | _ftools_.enumerate(__)
+    | _ftools_.enumerate
     | _ftools_.mapl( "{}. {}".format |_funsInv_|  __ )  
     | _ftools_.join("\n") 
     | _fun_.print
@@ -156,9 +156,19 @@ same as
     os.listdir() 
     | _ftools_.where(__.endswith(".py")) 
     | _ftools_.sorted(key=len)
-    | _ftools_.enumerate(__)
+    | _ftools_.enumerate
     | _ftools_.mapl( "{}. {}" )  
     | _ftools_.join("\n") 
+    | _fun_.print
+)
+#OR
+(
+    os.listdir() 
+    | _ftools_.where(__.endswith(".py")) 
+    | _ftools_.sorted(key=len)
+    | _ftools_.enumerate
+    | _ftools_.format( "{}. {}" )  
+    | _ftools_.join_n
     | _fun_.print
 )
 ```
@@ -189,7 +199,7 @@ dfply as `df` (also as `_df` and `df_`)
 ## Curried Functions
 All functions available in JulienPalard/Pipe have a twin function that calls the list function on the result of the original function: theses functions ends by `l`  
 `wherel`, `selectl`, ....  
-More: mapl, zipl, filterl, rangel, enumeratel, sorted, join
+More: mapl, zipl, filterl, rangel, enumeratel, sorted, join, enumeratel, enumerate, sorted, join_n, join_comma, format_sep, format_n, format_comma
 
 ## Comments 
 when `_funs_`(`_funsInv_`) is not between pipes (`|_funs_|`, `|_funsInv_|`), it act same as `_fun_`. The only difference between `_fun_` and `_funs` (`_funsInv`) it's when they are between pipes, otherwise they are the same   
