@@ -4,6 +4,17 @@ Based On [sspipe/sspipe](https://github.com/sspipe/sspipe)  itself based on  [Ju
 Based On [/pytoolz/toolz](https://github.com/pytoolz/toolz) (toolz.curried)  
 Based On [kieferk/dfply](https://github.com/kieferk/dfply)
 
+Table of Contents
+=================
+
+   * [studyPipe: Convenient pipe in python | Pipe pratique en python](#studypipe-convenient-pipe-in-python--pipe-pratique-en-python)
+      * [studyPipe's vocabulary:](#studypipes-vocabulary)
+      * [Install:](#install)
+      * [Usage:](#usage)
+      * [Imported pipes:](#imported-pipes)
+      * [Curried Functions](#curried-functions)
+      * [Comments](#comments)
+
 **Example: functions in the re module (regex)**  
 Without studyPipe
 
