@@ -90,7 +90,7 @@ Pipe.__rmod__=Pipe.__ror__
 
 
 #with no curryMe
-Pipe2.__ror__=ror_callable 
+# Pipe2.__ror__=ror_callable 
 Pipe2.__rmod__=Pipe2.__ror__
 
 
@@ -132,135 +132,13 @@ def patch_all2():
     except ImportError:
         pass
 
-class placeholder:
-    def __init__(self,calla=False,func=lambda x,f=None:f(x) if f is not None else x):
-        self.calla=calla
-        self.func = func
-    def __getattr__(self,a):
-        global config
-        g=config.globalsFn
-        if a in g():
-            # if self.calla and callable( g()[a]):
-            #     return sspipe.p( g()[a])
-            return Pipe(lambda x: g()[a])
-        if has_method(builtins,a):
-            # if self.calla and callable(getattr(builtins,a)):
-            #     return sspipe.p( getattr(builtins,a))
-            return Pipe(lambda x:getattr(builtins,a))
-        return None
-
-    @staticmethod
-    def __array_ufunc__(func, method, *args, **kwargs):
-        import numpy
-        if callable(method) and args[0] == '__call__':
-            # print(args[2].__class__.__name__)
-            if method is numpy.bitwise_or:
-                if isinstance(args[1], Pipe):
-                    return Pipe.partial(_resolve, args[2], args[1])
-                elif isinstance(args[1], Pipe2):
-                    return Pipe2.partial(_resolve, args[2], args[1])
-                elif isinstance(args[2], placeholder):
-                    return args[2].__ror__(args[1])
-                elif isinstance(args[2], placeholder2):
-                    return args[2].__ror__(args[1])
-                else:
-                    return _resolve(args[2], args[1],Pipe)
-            return Pipe.partial(method, *args[1:], **kwargs)
-        elif method == '__call__':
-            if func.name == 'bitwise_or':
-                if isinstance(args[0], Pipe):
-                    return Pipe.partial(_resolve, args[1], args[0])
-                elif isinstance(args[0], Pipe2):
-                    return Pipe2.partial(_resolve, args[1], args[0])
-                elif isinstance(args[1], placeholder):
-                    return args[1].__ror__(args[0])
-                elif isinstance(args[1], placeholder2):
-                    return args[1].__ror__(args[0])
-                else:
-                    return _resolve(args[1], args[0],Pipe)
-            return Pipe.partial(func, *args, **kwargs)
-        return NotImplemented
-
-    def __or__(self, other):
-        return self.func(other)
-
-    def __ror__(self, other):
-        return placeholder2(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe2) else self.func(other, x))
-    
-    def __mod__(self, other):
-        return self.__or__(other)
-
-    def __rmod__(self, other):
-        return self.__ror__(other)
-
-class placeholder2:
-    def __init__(self,calla=False,func=lambda x,f=None:f(x) if f is not None else x):
-        self.calla=calla
-        self.func = func
-    def __getattr__(self,a):
-        global config
-        g=config.globalsFn
-        if a in g():
-            # if self.calla and callable( g()[a]):
-            #     return sspipe.p( g()[a])
-            return Pipe2(lambda x: g()[a])
-        if has_method(builtins,a):
-            # if self.calla and callable(getattr(builtins,a)):
-            #     return sspipe.p( getattr(builtins,a))
-            return Pipe2(lambda x:getattr(builtins,a))
-        return None
-
-    @staticmethod
-    def __array_ufunc__(func, method, *args, **kwargs):
-        import numpy
-        if callable(method) and args[0] == '__call__':
-            # print(args[2].__class__.__name__)
-            if method is numpy.bitwise_or:
-                if isinstance(args[1], Pipe):
-                    return Pipe.partial(_resolve, args[2], args[1])
-                elif isinstance(args[1], Pipe2):
-                    return Pipe2.partial(_resolve, args[2], args[1])
-                elif isinstance(args[2], placeholder):
-                    return args[2].__ror__(args[1])
-                elif isinstance(args[2], placeholder2):
-                    return args[2].__ror__(args[1])
-                else:
-                    return _resolve(args[2], args[1],Pipe2)
-            return Pipe2.partial(method, *args[1:], **kwargs)
-        elif method == '__call__':
-            if func.name == 'bitwise_or':
-                if isinstance(args[0], Pipe):
-                    return Pipe.partial(_resolve, args[1], args[0])
-                elif isinstance(args[0], Pipe2):
-                    return Pipe2.partial(_resolve, args[1], args[0])
-                elif isinstance(args[1], placeholder):
-                    return args[1].__ror__(args[0])
-                elif isinstance(args[1], placeholder2):
-                    return args[1].__ror__(args[0])
-                else:
-                    return _resolve(args[1], args[0],Pipe2)
-            return Pipe2.partial(func, *args, **kwargs)
-        return NotImplemented
-
-    def __or__(self, other):
-        return self.func(other)
-
-    def __ror__(self, other):
-        return placeholder2(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,Pipe2) else self.func(other, x))
-
-    def __mod__(self, other):
-        return self.__or__(other)
-
-    def __rmod__(self, other):
-        return self.__ror__(other)
-
 def iterable(a):
     try:
         (x for x in a)
         return True
     except TypeError:
         return False
-def curryX(x,f=None):
+def curryX(x,f=None,cls=Pipe):
     def curryXX(o):
         if isinstance(o,list) or isinstance(o,tuple):
             return f(*o)
@@ -269,70 +147,70 @@ def curryX(x,f=None):
         return f(o)
     if f is None:
         return f
-    if not isinstance(x,Pipe):
+    if not isinstance(x,cls):
         return f(x)
-    return Pipe.partial(curryXX,x)
+    return cls.partial(curryXX,x)
 
-class placeholder3:
-    def __init__(self,calla=False,func=curryX):
-        self.calla=calla
-        self.func = func
+def getStaticMethod(mod,cls,met):        
+    modu=__import__(mod)
+    clss=getattr(modu,cls)
+    met=getattr(clss,met)
+    return met
+
+def getStaticMethodFromObj(obj,met):
+    mod=obj.__module__
+    cls=obj.__class__.__name__
+    return getStaticMethod(mod,cls,met)
+
+def getStaticMethodFromCls(obj,met):
+    mod=obj.__module__
+    cls=obj.__name__
+    return getStaticMethod(mod,cls,met)
+
+class placeholderI(object):
+    MY_PIPE=Pipe
+    MY_FUNC=lambda x,f=None:f(x) if f is not None else x
+
+    def special__ror__np(self,argu):
+        return self.__ror__(argu)
+    def __init__(self,calla=False,func=None):
+        self.calla= calla
+        self.func = getStaticMethodFromObj(self,"MY_FUNC")
     def __getattr__(self,a):
         global config
         g=config.globalsFn
         if a in g():
-            # if self.calla and callable( g()[a]):
-            #     return sspipe.p( g()[a])
-            return Pipe(lambda x: g()[a])
+            return getStaticMethodFromObj(self,"MY_PIPE")(lambda x: g()[a])
         if has_method(builtins,a):
-            # if self.calla and callable(getattr(builtins,a)):
-            #     return sspipe.p( getattr(builtins,a))
-            return Pipe(lambda x:getattr(builtins,a))
+            return getStaticMethodFromObj(self,"MY_PIPE")(lambda x:getattr(builtins,a))
         return None
 
-    @staticmethod
-    def __array_ufunc__(func, method, *args, **kwargs):
+    @classmethod
+    def __array_ufunc__(cls,func, method, *args, **kwargs):
         import numpy
         if callable(method) and args[0] == '__call__':
-            # print(args[2].__class__.__name__)
             if method is numpy.bitwise_or:
                 if isinstance(args[1], Pipe):
                     return Pipe.partial(_resolve, args[2], args[1])
                 elif isinstance(args[1], Pipe2):
                     return Pipe2.partial(_resolve, args[2], args[1])
-                elif isinstance(args[2], placeholder):
+                elif isinstance(args[2], placeholderI):
                     return args[2].__ror__(args[1])
-                elif isinstance(args[2], placeholder2):
-                    return args[2].__ror__(args[1])
-                elif isinstance(args[2], placeholder3):
-                    return args[2].__ror__(args[1],okO=True)
                 else:
-                    return _resolve(args[2], args[1],Pipe)
-            return Pipe.partial(method, *args[1:], **kwargs)
+                    return _resolve(args[2], args[1],getStaticMethodFromCls(cls,"MY_PIPE"))
+            return getStaticMethodFromCls(cls,"MY_PIPE").partial(method, *args[1:], **kwargs)
         elif method == '__call__':
             if func.name == 'bitwise_or':
                 if isinstance(args[0], Pipe):
                     return Pipe.partial(_resolve, args[1], args[0])
                 elif isinstance(args[0], Pipe2):
                     return Pipe2.partial(_resolve, args[1], args[0])
-                elif isinstance(args[1], placeholder):
+                elif isinstance(args[1], placeholderI):
                     return args[1].__ror__(args[0])
-                elif isinstance(args[1], placeholder2):
-                    return args[1].__ror__(args[0])
-                elif isinstance(args[1], placeholder3):
-                    return args[1].__ror__(args[0],okO=True)
                 else:
-                    return _resolve(args[1], args[0],Pipe)
-            return Pipe.partial(func, *args, **kwargs)
+                    return _resolve(args[1], args[0],getStaticMethodFromCls(cls,"MY_PIPE"))
+            return getStaticMethodFromCls(cls,"MY_PIPE").partial(func, *args, **kwargs)
         return NotImplemented
-
-    def __or__(self, other):
-        return self.func(other)
-
-    def __ror__(self,other, okO=False):
-        if iterable(other) and type(other) != "str":
-            other=Pipe.collection(other)
-        return placeholder3(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(other, x))
 
     def __mod__(self, other):
         return self.__or__(other)
@@ -340,63 +218,46 @@ class placeholder3:
     def __rmod__(self, other):
         return self.__ror__(other)
 
-class placeholder4:
-    def __init__(self,calla=False,func=curryX):
-        self.calla=calla
-        self.func = func
-    def __getattr__(self,a):
-        global config
-        g=config.globalsFn
-        if a in g():
-            # if self.calla and callable( g()[a]):
-            #     return sspipe.p( g()[a])
-            return Pipe(lambda x: g()[a])
-        if has_method(builtins,a):
-            # if self.calla and callable(getattr(builtins,a)):
-            #     return sspipe.p( getattr(builtins,a))
-            return Pipe(lambda x:getattr(builtins,a))
-        return None
+    def __or__(self, other):
+        return self.func(other)
 
-    @staticmethod
-    def __array_ufunc__(func, method, *args, **kwargs):
-        import numpy
-        print("uio")
-        if callable(method) and args[0] == '__call__':
-            # print(args[2].__class__.__name__)
-            if method is numpy.bitwise_or:
-                if isinstance(args[1], Pipe):
-                    return Pipe.partial(_resolve, args[2], args[1])
-                elif isinstance(args[1], Pipe2):
-                    return Pipe2.partial(_resolve, args[2], args[1])
-                elif isinstance(args[2], placeholder):
-                    return args[2].__ror__(args[1])
-                elif isinstance(args[2], placeholder2):
-                    return args[2].__ror__(args[1])
-                elif isinstance(args[2], placeholder3):
-                    return args[2].__ror__(args[1],okO=True)
-                elif isinstance(args[2], placeholder4):
-                    return args[2].__ror__(args[1],okO=True)
-                else:
-                    return _resolve(args[2], args[1],Pipe)
-            return Pipe.partial(method, *args[1:], **kwargs)
-        elif method == '__call__':
-            if func.name == 'bitwise_or':
-                if isinstance(args[0], Pipe):
-                    return Pipe.partial(_resolve, args[1], args[0])
-                elif isinstance(args[0], Pipe2):
-                    return Pipe2.partial(_resolve, args[1], args[0])
-                elif isinstance(args[1], placeholder):
-                    return args[1].__ror__(args[0])
-                elif isinstance(args[1], placeholder2):
-                    return args[1].__ror__(args[0])
-                elif isinstance(args[1], placeholder3):
-                    return args[1].__ror__(args[0],okO=True)
-                elif isinstance(args[1], placeholder4):
-                    return args[1].__ror__(args[0],okO=True)
-                else:
-                    return _resolve(args[1], args[0],Pipe)
-            return Pipe.partial(func, *args, **kwargs)
-        return NotImplemented
+    def __ror__(self, other):
+        return getStaticMethodFromObj(self,"__init__")(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,getStaticMethodFromObj(self,"MY_PIPE")) else self.func(other, x))
+
+class placeholder(placeholderI): pass
+    
+class placeholderBis(placeholderI):
+    MY_PIPE=Pipe2
+
+class placeholder2(placeholderI):
+    MY_FUNC=curryX
+   
+    def special__ror__np(self,argu):
+        return self.__ror__(argu,okO=True)
+
+    def __ror__(self,other, okO=False):
+        if iterable(other) and type(other) != "str":
+            other=Pipe.collection(other)
+        return placeholder2(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(other, x))
+
+class placeholder2Bis(placeholderI):
+    MY_FUNC=curried.curry(curryX)(cls=Pipe2)
+    MY_PIPE=Pipe2
+
+    def special__ror__np(self,argu):
+        return self.__ror__(argu,okO=True)
+
+    def __ror__(self,other, okO=False):
+        if iterable(other) and type(other) != "str":
+            other=Pipe2.collection(other)
+        return placeholder2(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe2) and okO  else self.func(other, x))
+
+
+class placeholder3(placeholderI):
+    MY_FUNC=curryX
+
+    def special__ror__np(self,argu):
+        return self.__ror__(argu,okO=True)
 
     def __or__(self, other):
         # print(other) 
@@ -407,13 +268,25 @@ class placeholder4:
     def __ror__(self,other, okO=False):
         if iterable(other) and type(other) != "str":
             other=Pipe.collection(other)
-        return placeholder4(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(x,other))
+        return placeholder3(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(x,other))
 
-    def __mod__(self, other):
-        return self.__or__(other)
+class placeholder3Bis(placeholderI):
+    MY_FUNC=curried.curry(curryX)(cls=Pipe2)
+    MY_PIPE=Pipe2
 
-    def __rmod__(self, other):
-        return self.__ror__(other)
+    def special__ror__np(self,argu):
+        return self.__ror__(argu,okO=True)
+
+    def __or__(self, other):
+        # print(other) 
+        if iterable(other) and type(other) != "str" and not isinstance(other,Pipe2):
+            other=Pipe2.collection(other)
+        return self.func(other)
+
+    def __ror__(self,other, okO=False):
+        if iterable(other) and type(other) != "str":
+            other=Pipe2.collection(other)
+        return placeholder3Bis(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe2) and okO  else self.func(x,other))
 
 # def rorFuns(lambda x,self,other):
 #     if isinstance(other,Pipe):
@@ -422,11 +295,12 @@ class placeholder4:
 
 patch_all2()
 _fun_=placeholder()
-__fun__=placeholder2() #with no curryMe
+__fun__=placeholderBis() #with no curryMe
 # ____=placeholder(calla=T)
-_funs_=placeholder3()
-_funsInv_=placeholder4()
-
+_funs_=placeholder2()
+__funs__=placeholder2bis()
+_funsInv_=placeholder3()
+__funsInv__=placeholder3bis()
 #### construct _ftools_
 class opy: pass
 
