@@ -56,6 +56,7 @@ def convert_pipe(original_pipe):
 
 def ror_callable(self, other):
     ret = _resolve(self, other)
+    # print("OO")
     if callable(ret): ret=ret(other)
     return ret
 
@@ -105,6 +106,7 @@ def _patch_cls_method(cls, method):
     def wrapper(self, x, *args, **kwargs):
         # if placeholderFn(x) or placeholder(x):
         #     return NotImplemented
+        # print("lalala")
         if isinstance(x, Pipe) or  isinstance(x, Pipe2) or isinstance(x,placeholder)  or  isinstance(x, placeholder2) or  isinstance(x, placeholder3):
             return NotImplemented
         return original(self, x, *args, **kwargs)
@@ -166,16 +168,17 @@ def getStaticMethodFromCls(obj,met):
     mod=obj.__module__
     cls=obj.__name__
     return getStaticMethod(mod,cls,met)
-
+def fnI(x,f=None):
+    return f(x) if f is not None else x
 class placeholderI(object):
     MY_PIPE=Pipe
-    MY_FUNC=lambda x,f=None:f(x) if f is not None else x
+    MY_FUNC=fnI
 
     def special__ror__np(self,argu):
         return self.__ror__(argu)
     def __init__(self,calla=False,func=None):
         self.calla= calla
-        self.func = getStaticMethodFromObj(self,"MY_FUNC")
+        self.func = func if func is not None else getStaticMethodFromObj(self,"MY_FUNC")
     def __getattr__(self,a):
         global config
         g=config.globalsFn
@@ -222,7 +225,34 @@ class placeholderI(object):
         return self.func(other)
 
     def __ror__(self, other):
-        return getStaticMethodFromObj(self,"__init__")(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,getStaticMethodFromObj(self,"MY_PIPE")) else self.func(other, x))
+        return self.__class__(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,getStaticMethodFromObj(self,"MY_PIPE")) else self.func(other, x))
+def __array_ufunc2__(func, method, *args, **kwargs):
+    import numpy
+    if callable(method) and args[0] == '__call__':
+        if method is numpy.bitwise_or:
+            if isinstance(args[1], Pipe):
+                return Pipe.partial(_resolve, args[2], args[1])
+            elif isinstance(args[1], Pipe2):
+                return Pipe2.partial(_resolve, args[2], args[1])
+            elif isinstance(args[2], placeholderI):
+                return args[2].__ror__(args[1])
+            else:
+                return ror_callable(args[2], args[1])
+        return Pipe.partial(method, *args[1:], **kwargs)
+    elif method == '__call__':
+        if func.name == 'bitwise_or':
+            if isinstance(args[0], Pipe):
+                return Pipe.partial(_resolve, args[1], args[0])
+            elif isinstance(args[0], Pipe2):
+                return Pipe2.partial(_resolve, args[1], args[0])
+            elif isinstance(args[1], placeholderI):
+                return args[1].__ror__(args[0])
+            else:
+                return ror_callable(args[1], args[0])
+        return Pipe.partial(func, *args, **kwargs)
+    return NotImplemented
+
+setattr(Pipe,"__array_ufunc__",staticmethod(__array_ufunc2__))
 
 class placeholder(placeholderI): pass
     
@@ -298,9 +328,9 @@ _fun_=placeholder()
 __fun__=placeholderBis() #with no curryMe
 # ____=placeholder(calla=T)
 _funs_=placeholder2()
-__funs__=placeholder2bis()
+__funs__=placeholder2Bis()
 _funsInv_=placeholder3()
-__funsInv__=placeholder3bis()
+__funsInv__=placeholder3Bis()
 #### construct _ftools_
 class opy: pass
 
