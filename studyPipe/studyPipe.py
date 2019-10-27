@@ -313,14 +313,14 @@ class placeholderI(object):
         return self.__ror__(argu)
     def __init__(self,calla=False,func=None):
         self.calla= calla
-        self.func = func if func is not None else getStaticMethodFromObj(self,"MY_FUNC")
+        self.func = func if func is not None else self.MY_FUNC
     def __getattr__(self,a):
         global config
         g=config.globalsFn
         if a in g():
-            return getStaticMethodFromObj(self,"MY_PIPE")(lambda x: g()[a])
+            return self.__class__.MY_PIPE(lambda x: g()[a])
         if has_method(builtins,a):
-            return getStaticMethodFromObj(self,"MY_PIPE")(lambda x:getattr(builtins,a))
+            return self.__class__.MY_PIPE(lambda x:getattr(builtins,a))
         return None
 
     @classmethod
@@ -335,8 +335,8 @@ class placeholderI(object):
                 elif isinstance(args[2], placeholderI):
                     return args[2].__ror__(args[1])
                 else:
-                    return _resolve(args[2], args[1],getStaticMethodFromCls(cls,"MY_PIPE"))
-            return getStaticMethodFromCls(cls,"MY_PIPE").partial(method, *args[1:], **kwargs)
+                    return _resolve(args[2], args[1],cls.MY_PIPE)
+            return cls.MY_PIPE.partial(method, *args[1:], **kwargs)
         elif method == '__call__':
             if func.name == 'bitwise_or':
                 if isinstance(args[0], Pipe):
@@ -346,8 +346,8 @@ class placeholderI(object):
                 elif isinstance(args[1], placeholderI):
                     return args[1].__ror__(args[0])
                 else:
-                    return _resolve(args[1], args[0],getStaticMethodFromCls(cls,"MY_PIPE"))
-            return getStaticMethodFromCls(cls,"MY_PIPE").partial(func, *args, **kwargs)
+                    return _resolve(args[1], args[0],cls.MY_PIPE)
+            return cls.MY_PIPE.partial(func, *args, **kwargs)
         return NotImplemented
 
     def __mod__(self, other):
@@ -360,7 +360,7 @@ class placeholderI(object):
         return self.func(other)
 
     def __ror__(self, other):
-        return self.__class__(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,getStaticMethodFromObj(self,"MY_PIPE")) else self.func(other, x))
+        return self.__class__(func=lambda x, self=self, other=other: x.__ror__(other) if isinstance(other,self.MY_PIPE) else self.func(other, x))
 def __array_ufunc2__(func, method, *args, **kwargs):
     import numpy
     if callable(method) and args[0] == '__call__':
