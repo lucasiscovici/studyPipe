@@ -133,6 +133,51 @@ class Pipe__(object):
 
         return cls(_resolve_collection_creation)
 
+def _override_operator(op, impl):
+    def __operator__(*args):
+        return Pipe__.partial(impl, *args)
+
+    setattr(Pipe__, op, __operator__)
+
+
+def _reverse_args(func):
+    def wrapper(*args):
+        return func(*args[::-1])
+
+    return wrapper
+
+
+for _op in [
+    'len', 'abs',
+    'contains', 'await',
+    'lt', 'le', 'gt', 'ge', 'eq', 'ne',
+    'xor', 'and',
+    'rxor', 'rand',
+    'rshift', 'lshift',
+    'rrshift', 'rlshift',
+    'add', 'sub', 'mul', 'matmul', 'pow',
+    'radd', 'rsub', 'rmul', 'rmatmul', 'rpow',
+    'truediv', 'floordiv', 'mod',
+    'rfloordiv', 'rmod',  # skipped rtruediv because it is implemented in Pipe class
+    'pos', 'neg', 'invert',
+    ]:
+    _name = '__{}__'.format(_op)
+
+    if _op in ['and', 'rand']:
+        _impl = operator.and_
+    elif _op == 'len':
+        _impl = len
+    elif _op == 'await':
+        async def _impl(x):
+            return await x
+    else:
+        try:
+            _impl = getattr(operator, _op)
+        except AttributeError:  # radd, rrshift, rsub, rmul, ...
+            _op = _op[1:]  # remove the first 'r' letter
+            _impl = _reverse_args(getattr(operator, _op))
+
+    _override_operator(_name, _impl)
 class Pipe(Pipe__): pass
   
 class Pipe2(Pipe__): pass  
