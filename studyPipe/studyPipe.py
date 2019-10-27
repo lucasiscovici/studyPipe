@@ -336,7 +336,7 @@ class placeholderI(object):
         return self.__ror__(argu)
     def __init__(self,calla=False,func=None):
         self.calla= calla
-        self.func = func if func is not None else self.__clas__.MY_FUNC
+        self.func = func if func is not None else self.__class__.MY_FUNC
     def __getattr__(self,a):
         global config
         g=config.globalsFn
