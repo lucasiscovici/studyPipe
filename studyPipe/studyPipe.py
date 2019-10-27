@@ -406,7 +406,7 @@ class placeholder2(placeholderI):
         return placeholder2(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(other, x))
 
 class placeholder2Bis(placeholderI):
-    MY_FUNC=curried.partial(curryX,cls=Pipe2)
+    MY_FUNC=lambda x,f=None:curryX(x,f,cls=Pipe2)
     MY_PIPE=Pipe2
 
     def special__ror__np(self,argu):
@@ -436,7 +436,7 @@ class placeholder3(placeholderI):
         return placeholder3(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(x,other))
 
 class placeholder3Bis(placeholderI):
-    MY_FUNC=curried.partial(curryX,cls=Pipe2)
+    MY_FUNC=lambda x,f=None:curryX(x,f,cls=Pipe2)
     MY_PIPE=Pipe2
 
     def special__ror__np(self,argu):
