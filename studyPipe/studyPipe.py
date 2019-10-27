@@ -287,7 +287,30 @@ def curryX(x,f=None,cls=Pipe):
     if not isinstance(x,cls):
         return f(x)
     return cls.partial(curryXX,x)
-
+def curryXP(x,f=None):
+    def curryXX(o):
+        if isinstance(o,list) or isinstance(o,tuple):
+            return f(*o)
+        if isinstance(o,dict):
+            return f(**o)
+        return f(o)
+    if f is None:
+        return f
+    if not isinstance(x,Pipe):
+        return f(x)
+    return Pipe.partial(curryXX,x)
+def curryXP2(x,f=None):
+    def curryXX(o):
+        if isinstance(o,list) or isinstance(o,tuple):
+            return f(*o)
+        if isinstance(o,dict):
+            return f(**o)
+        return f(o)
+    if f is None:
+        return f
+    if not isinstance(x,Pipe2):
+        return f(x)
+    return Pipe2.partial(curryXX,x)
 def getStaticMethod(mod,cls,met):        
     modu=__import__(mod)
     clss=getattr(modu,cls)
@@ -313,7 +336,7 @@ class placeholderI(object):
         return self.__ror__(argu)
     def __init__(self,calla=False,func=None):
         self.calla= calla
-        self.func = func if func is not None else self.MY_FUNC
+        self.func = func if func is not None else self.__clas__.MY_FUNC
     def __getattr__(self,a):
         global config
         g=config.globalsFn
@@ -395,7 +418,7 @@ class placeholderBis(placeholderI):
     MY_PIPE=Pipe2
 
 class placeholder2(placeholderI):
-    MY_FUNC=curryX
+    MY_FUNC=curryXP
    
     def special__ror__np(self,argu):
         return self.__ror__(argu,okO=True)
@@ -406,7 +429,7 @@ class placeholder2(placeholderI):
         return placeholder2(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(other, x))
 
 class placeholder2Bis(placeholderI):
-    MY_FUNC=lambda x,f=None:curryX(x,f,cls=Pipe2)
+    MY_FUNC=curryXP2
     MY_PIPE=Pipe2
 
     def special__ror__np(self,argu):
@@ -419,7 +442,7 @@ class placeholder2Bis(placeholderI):
 
 
 class placeholder3(placeholderI):
-    MY_FUNC=curryX
+    MY_FUNC=curryXP
 
     def special__ror__np(self,argu):
         return self.__ror__(argu,okO=True)
@@ -436,7 +459,7 @@ class placeholder3(placeholderI):
         return placeholder3(func=lambda x, self=self,other=other: x.__ror__(other) if isinstance(other,Pipe) and okO  else self.func(x,other))
 
 class placeholder3Bis(placeholderI):
-    MY_FUNC=lambda x,f=None:curryX(x,f,cls=Pipe2)
+    MY_FUNC=curryXP2
     MY_PIPE=Pipe2
 
     def special__ror__np(self,argu):
