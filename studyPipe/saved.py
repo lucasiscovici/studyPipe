@@ -2,10 +2,9 @@ import copy
 import builtins
 import functools
 import re
-import operator
 
 import sspipe 
-# from sspipe import Pipe as Pipe__
+from sspipe import Pipe as Pipe_
 from sspipe import p, px
 from sspipe import p as _p, px as _px
 from sspipe import p as p_, px as px_
@@ -23,126 +22,12 @@ from toolz import curried
 from toolz import curried as _c
 from toolz import curried as c_
 
-# __ = sspipe.px
-    
-# Pipe_=copy.deepcopy(Pipe__)
-# Pipe=Pipe_
-# SOURCE SSPipe
-class Pipe__(object):
-    __slots__ = ('_____func___',)
+__ = sspipe.px
 
-    def __init__(self, func):
-        self._____func___ = func
-
-    def __ror__(self, other):
-        ret = _resolve(self, other,self.__class__)
-        return ret
-
-    def __or__(self, other):
-        if isinstance(other, self.__class__):
-            return self.__class__(lambda x: _resolve(other, _resolve(self, x,self.__class__),self.__class__))
-
-        return self.__class__(lambda x: _resolve(self, x,self.__class__) | other)
-
-    def __rtruediv__(self, other):
-        if isinstance(other, FALLBACK_RTRUEDIV_TYPES):
-            return _resolve(self, other,self.__class__)
-
-        return self.__class__(lambda x: _resolve(other, x,self.__class__) / _resolve(self, x,self.__class__))
-
-    def __getattr__(self, item):
-        return self.__class__.partial(getattr, self, item)
-
-    def __call__(self, *args, **kwargs):
-        return self.__class__.partial(self, *args, **kwargs)
-
-    def __getitem__(self, item):
-        if isinstance(item, tuple) and len(item) < 20:  # do not iterate over too large tuples!
-            item = self.__class__.collection(item)
-        return self.__class__.partial(operator.getitem, self, item)
-
-    __array_priority__ = -10
-
-    @classmethod
-    def __array_ufunc__(cls,func, method, *args, **kwargs):
-        import numpy
-        if callable(method) and args[0] == '__call__':
-            if method is numpy.bitwise_or:
-                if isinstance(args[1], Pipe):
-                    return self.__class__.partial(_resolve, args[2], args[1],cls)
-                else:
-                    return _resolve(args[2], args[1],cls)
-            return cls.partial(method, *args[1:], **kwargs)
-        elif method == '__call__':
-            if func.name == 'bitwise_or':
-                if isinstance(args[0], Pipe):
-                    return self.__class__.partial(_resolve, args[1], args[0],cls)
-                else:
-                    return _resolve(args[1], args[0],cls)
-            return cls.partial(func, *args, **kwargs)
-        return NotImplemented
-
-    @staticmethod
-    def unpipe(pipe):
-        if isinstance(pipe, Pipe__):
-            return pipe._____func___
-        else:
-            return pipe
-
-    @classmethod
-    def partial(cls,func, *args, **kwargs):
-        # Code duplication in this function is intentional to increase performance.
-        # print(func)
-        if isinstance(func, cls):
-            if kwargs:
-                def _resolve_function_call(x):
-                    resolved_func = _resolve(func, x,cls)
-                    resolved_args = (_resolve(arg, x,cls) for arg in args)
-                    resolved_kwargs = {k: _resolve(v, x,cls) for k, v in kwargs.items()}
-                    return resolved_func(*resolved_args, **resolved_kwargs)
-            else:
-                def _resolve_function_call(x):
-                    resolved_func = _resolve(func, x,cls)
-                    resolved_args = (_resolve(arg, x,cls) for arg in args)
-                    return resolved_func(*resolved_args)
-            # print(cls)
-            return cls(_resolve_function_call)
-        else:
-            if kwargs:
-                def _resolve_function_call(x):
-                    resolved_args = (_resolve(arg, x,cls) for arg in args)
-                    resolved_kwargs = {k: _resolve(v, x,cls) for k, v in kwargs.items()}
-                    return func(*resolved_args, **resolved_kwargs)
-            else:
-                def _resolve_function_call(x):
-                    resolved_args = (_resolve(arg, x,cls) for arg in args)
-                    return func(*resolved_args)
-
-            return cls(_resolve_function_call)
-
-    @classmethod
-    def collection(cls,items):
-        if isinstance(items, dict):
-            def _resolve_collection_creation(x):
-                resolved_items = {_resolve(key, x,cls): _resolve(val, x,cls) for key, val in items.items()}
-                return dict(resolved_items)
-        else:
-            def _resolve_collection_creation(x):
-                resolved_items = (_resolve(item, x,cls) for item in items)
-                return type(items)(resolved_items)
-
-        return cls(_resolve_collection_creation)
-
-class Pipe(Pipe__): pass
-  
-class Pipe2(Pipe__): pass  
-
-class PipeX(Pipe,Pipe2): pass
-__=PipeX(lambda x:x)
-# Pipe=copy.deepcopy(Pipe_)
+Pipe=copy.deepcopy(Pipe_)
 # Pipe2=copy.deepcopy(Pipe_) #with no curryMe
 
-# Pipe2.__name__="Pipe2"
+Pipe2.__name__="Pipe2"
 T=True
 F=False
 
@@ -152,7 +37,7 @@ class config:
 
 #SOURCE: sspipe
 def _resolve(pipe, x, cls=Pipe):
-    while isinstance(pipe, Pipe__):
+    while isinstance(pipe, cls):
         pipe = pipe._____func___(x)
     return pipe
 
@@ -161,37 +46,18 @@ def _resolve2(pipe, x, cls=Pipe):
         pipe = pipe._____func___(x)
     return x
 
-def convert_pipe(original_pipe2):
-    @functools.wraps(original_pipe2)
-    def method(self,*args, **kwargs):
-        # print(Pipe)
+def convert_pipe(original_pipe):
+    @functools.wraps(original_pipe)
+    def method(self, *args, **kwargs):
         args = (Pipe.unpipe(arg) if isinstance(arg, Pipe) else arg for arg in args)
         kwargs = {k: Pipe.unpipe(v) if isinstance(v, Pipe) else v for k, v in kwargs.items()}
-        return Pipe(original_pipe2(*args, **kwargs))
-    return method
-
-def convert_pipe2(original_pipe2):
-    @functools.wraps(original_pipe2)
-    def method(self,*args, **kwargs):
-        # print(Pipe)
-        args = (Pipe.unpipe(arg) if isinstance(arg, Pipe) else arg for arg in args)
-        kwargs = {k: Pipe.unpipe(v) if isinstance(v, Pipe) else v for k, v in kwargs.items()}
-        return Pipe(original_pipe2(*args, **kwargs).function)
-    return method
-
-def convert_pipe3(original_pipe2):
-    @functools.wraps(original_pipe2)
-    def method(*args, **kwargs):
-        # print(Pipe)
-        args = (Pipe.unpipe(arg) if isinstance(arg, Pipe) else arg for arg in args)
-        kwargs = {k: Pipe.unpipe(v) if isinstance(v, Pipe) else v for k, v in kwargs.items()}
-        return Pipe(original_pipe2(*args, **kwargs).function)
+        return Pipe(original_pipe(*args, **kwargs))
     return method
 
 
 def ror_callable(self, other):
     ret = _resolve(self, other)
-    # print(ret)
+    # print("OO")
     if callable(ret): ret=ret(other)
     return ret
 
@@ -467,7 +333,7 @@ __funs__=placeholder2Bis()
 _funsInv_=placeholder3()
 __funsInv__=placeholder3Bis()
 #### construct _ftools_
-class opy(object): pass
+class opy: pass
 
 ####  toolz curried func
 oo=['accumulate',  'assoc',  'assoc_in',  'comp',  'complement',  'compose',  'concat',  'concatv',  'cons',  'count',  'countby',  'curry',  'diff',  'dissoc',  'do',  'drop',  'excepts',  'filter',  'first',  'flip',  'frequencies',  'get',  'get_in',  'groupby',  'identity',  'interleave',  'interpose',  'isdistinct',  'isiterable',  'itemfilter',  'itemmap',  'iterate',  'join',  'juxt',  'keyfilter',  'keymap',  'last',  'map',  'mapcat',  'memoize',  'merge',  'merge_sorted',  'merge_with',  'nth',  'operator',  'partial',  'partition',  'partition_all',  'partitionby',  'peek',  'pipe',  'pluck',  'random_sample',  'reduce',  'reduceby',  'remove',  'second',  'sliding_window',  'sorted',  'tail',  'take',  'take_nth',  'thread_first',  'thread_last',  'topk',  'unique',  'update_in',  'valfilter',  'valmap']
@@ -551,32 +417,23 @@ for i in toAA:
 
 setattr(opy,"format",_fun_.__getattr__("format_"))
 
-
-
-tt=convert_pipe3(_p.where.__wrapped__)
-tt2=convert_pipe3(_p.as_list.__wrapped__)
-# print(tt)
-r=dir(_p) | tt( _fun_.re.match("^[^_]") ) | tt2()
-# print(r)
+#### add Pipe functions from JulienPalard
+r=dir(_p) | _p.where( _fun_.re.match("^[^_]") ) | _p.as_list()
 u=oo+mapl(lambda a:a.__name__,toA)+mapl(lambda a:a.__name__,toAA)+["format"]
-lll=[]
 for i in r:
-    met=convert_pipe2(getattr(_p,i).__wrapped__)
+    met=getattr(_p,i)
     i2=i
     if i in u:
         i2=i+"2"
-    lll.append(i2)
     setattr(opy,i2,met)
 
-ooo=opy()
 #### add Pipe functions from JulienPalard
 u=oo+mapl(lambda a:a.__name__,toA)+mapl(lambda a:a.__name__,toAA)
-for i in lll:
-    met=getattr(ooo,i)
+for i in r:
+    met=getattr(_p,i)
     ij=i+"l"
     i2=ij
     if ij in u:
         continue
     setattr(opy,i2,lambda self,x,met=met: Pipe.partial(list,met(x)) )
-del ooo
 _ftools_=opy()
