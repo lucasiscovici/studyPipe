@@ -51,6 +51,9 @@ class Pipe__(object):
         return self.__class__(lambda x: _resolve(other, x,self.__class__) / _resolve(self, x,self.__class__))
 
     def __getattr__(self, item):
+        key=item
+        if key.startswith('__') and key.endswith('__'):
+            return super().__getattr__(key)
         return self.__class__.partial(getattr, self, item)
 
     def __call__(self, *args, **kwargs):
@@ -383,6 +386,9 @@ class placeholderI(object):
         self.calla= calla
         self.func = func if func is not None else self.__class__.MY_FUNC
     def __getattr__(self,a):
+        key=a
+        if key.startswith('__') and key.endswith('__'):
+            return super().__getattr__(key)
         global config
         g=config.globalsFn
         if a in g():
