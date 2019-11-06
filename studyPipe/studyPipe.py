@@ -195,7 +195,8 @@ T=True
 F=False
 
 class config:
-    globalsFn=lambda:globals()
+    globalsFn=lambda:get_ipython().user_global_ns()
+    localsFn=lambda:get_ipython().user_ns()
 
 
 #SOURCE: sspipe
@@ -387,6 +388,7 @@ class placeholderI(object):
         self.func = func if func is not None else self.__class__.MY_FUNC
     def __getattr__(self,a):
         key=a
+        #pb when pickle for __
         if key.startswith('__') and key.endswith('__'):
             return super().__getattr__(key)
         global config
