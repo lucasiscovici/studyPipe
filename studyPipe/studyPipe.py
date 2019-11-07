@@ -632,7 +632,7 @@ setattr(opy,"format",_fun_.__getattr__("format_"))
 tt=convert_pipe3(_p.where.__wrapped__)
 tt2=convert_pipe3(_p.as_list.__wrapped__)
 # print(tt)
-r=dir(_p) | tt( _fun_.re.match("^[^_]") ) | tt2()
+r=dir(_p) | tt( re.match |_funsInv_| ["^[^_]",__] ) | tt2()
 # print(r)
 u=oo+mapl(lambda a:a.__name__,toA)+mapl(lambda a:a.__name__,toAA)+["format"]
 lll=[]
