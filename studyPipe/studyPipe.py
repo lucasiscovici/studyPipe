@@ -195,8 +195,8 @@ T=True
 F=False
 
 class config:
-    globalsFn=lambda:get_ipython().user_global_ns()
-    localsFn=lambda:get_ipython().user_ns()
+    globalsFn=lambda: get_ipython().user_global_ns
+    localsFn=lambda: get_ipython().user_ns
 
 
 #SOURCE: sspipe
