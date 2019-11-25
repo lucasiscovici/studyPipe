@@ -29,10 +29,11 @@ from toolz import curried as c_
 # Pipe=Pipe_
 # SOURCE SSPipe
 class Pipe__(object):
-    __slots__ = ('_____func___',)
+    __slots__ = ('_____func___','special')
 
-    def __init__(self, func):
+    def __init__(self, func,*,special=False):
         self._____func___ = func
+        self.special=special
 
     def __ror__(self, other):
         ret = _resolve(self, other,self.__class__)
@@ -52,13 +53,26 @@ class Pipe__(object):
 
     def __getattr__(self, item):
         key=item
+        if key.startswith('___') and key.endswith('___'):
+            item=item[1:-1]
+            return self.__class__.partial(getattr, self, item)
+        # print(self.special)
         if key.startswith('__') and key.endswith('__'):
             return super().__getattr__(key)
-        return self.__class__.partial(getattr, self, item)
+        return self.__class__.partial(getattr, self, item,argsCLS=dict(special=self.special))
 
     def __call__(self, *args, **kwargs):
-        return self.__class__.partial(self, *args, **kwargs)
+        return self.__class__.partial(self, *args, **kwargs, argsCLS=dict(special=self.special))
 
+    def __dir__(self):
+        if self.special:
+            try:
+                print(self._____func___(None))
+
+                return dir(self._____func___(None))
+            except:
+                return []
+        return object.__dir__(self)
     def __getitem__(self, item):
         if isinstance(item, tuple) and len(item) < 20:  # do not iterate over too large tuples!
             item = self.__class__.collection(item)
@@ -92,8 +106,18 @@ class Pipe__(object):
         else:
             return pipe
 
+    @staticmethod
+    def unpipeSpecial(pipe):
+        if isinstance(pipe, Pipe__):
+            return pipe._____func___(None)
+        else:
+            return pipe
     @classmethod
-    def partial(cls,func, *args, **kwargs):
+    def completer__custom(cls,pipe):
+        return cls.unpipeSpecial(pipe) if pipe.special else cls.unpipe(pipe)
+
+    @classmethod
+    def partial(cls,func, *args ,argsCLS={}, **kwargs):
         # Code duplication in this function is intentional to increase performance.
         # print(func)
         if isinstance(func, cls):
@@ -109,7 +133,7 @@ class Pipe__(object):
                     resolved_args = (_resolve(arg, x,cls) for arg in args)
                     return resolved_func(*resolved_args)
             # print(cls)
-            return cls(_resolve_function_call)
+            return cls(_resolve_function_call,**argsCLS)
         else:
             if kwargs:
                 def _resolve_function_call(x):
@@ -121,7 +145,7 @@ class Pipe__(object):
                     resolved_args = (_resolve(arg, x,cls) for arg in args)
                     return func(*resolved_args)
 
-            return cls(_resolve_function_call)
+            return cls(_resolve_function_call,**argsCLS)
 
     @classmethod
     def collection(cls,items):
@@ -198,6 +222,24 @@ class config:
     globalsFn=lambda: get_ipython().user_global_ns
     localsFn=lambda: get_ipython().user_ns
 
+def setGlobals(a):
+    config.globalsFn=a
+
+def setLocals(a):
+    config.localsFn=a
+
+def configure(globalsFn,localsFn):
+    setGlobals(globalsFn)
+    setLocals(localsFn)
+
+def check_ipython():
+    try:
+        config.globalsFn()
+    except:
+        warnings.warn("""
+you have to:
+            studyPipe.configure(globals(),locals())
+""")
 
 #SOURCE: sspipe
 def _resolve(pipe, x, cls=Pipe):
@@ -393,10 +435,14 @@ class placeholderI(object):
             return super().__getattr__(key)
         global config
         g=config.globalsFn
-        if a in g():
-            return self.__class__.MY_PIPE(lambda x: g()[a])
+        try:
+            gg=g()
+        except:
+            gg=globals()
+        if a in gg:
+            return self.__class__.MY_PIPE(lambda x: g()[a],special=True)
         if has_method(builtins,a):
-            return self.__class__.MY_PIPE(lambda x:getattr(builtins,a))
+            return self.__class__.MY_PIPE(lambda x:getattr(builtins,a),special=True)
         return None
 
     @classmethod
