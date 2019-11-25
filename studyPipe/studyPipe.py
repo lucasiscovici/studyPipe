@@ -228,7 +228,7 @@ def setGlobals(a):
 def setLocals(a):
     config.localsFn=a
 
-def configure(globalsFn,localsFn):
+def configureStudyPipe(globalsFn,localsFn):
     setGlobals(globalsFn)
     setLocals(localsFn)
 
@@ -238,7 +238,13 @@ def check_ipython():
     except:
         warnings.warn("""
 you have to:
-            studyPipe.configure(globals(),locals())
+import studyPipe
+studyPipe.configureStudyPipe(globals(),locals())
+
+or 
+
+from studyPipe import *
+configureStudyPipe(globals(),locals())
 """)
 
 #SOURCE: sspipe
