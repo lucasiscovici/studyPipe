@@ -4,7 +4,9 @@ try:
   import google.colab
   from .studyPipe import __ as _p_
   __all__=["_p_"]
-  warnings.warn("""
+  with warnings.catch_warnings():
+  	warnings.filterwarnings("default")
+  	warnings.warn("""
 In Google Colab: __ become _p_
 """)
 except:
