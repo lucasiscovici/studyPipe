@@ -7,7 +7,7 @@ try:
   with warnings.catch_warnings():
   	warnings.filterwarnings("default")
   	warnings.warn("""
-In Google Colab: __ become _p_""")
+  		In Google Colab: __ become _p_""")
 except:
   from .studyPipe import __
   __all__=["__"]
