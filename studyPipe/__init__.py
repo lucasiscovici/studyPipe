@@ -1,5 +1,11 @@
 from .studyPipe import configureStudyPipe
 import warnings
+
+def custom_formatwarning(msg, *args, **kwargs):
+    # ignore everything except the message
+    return str(msg) + '\n'
+
+warnings.formatwarning = custom_formatwarning
 try:
   import google.colab
   from .studyPipe import __ as _p_

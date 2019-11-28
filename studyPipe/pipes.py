@@ -2,6 +2,12 @@ from . import _fun_, _funs_, _funsInv_
 from . import __fun__, __funs__, __funsInv__
 from . import _ftools_
 import warnings
+
+def custom_formatwarning(msg, *args, **kwargs):
+    # ignore everything except the message
+    return str(msg) + '\n'
+
+warnings.formatwarning = custom_formatwarning
 try:
   import google.colab
   from .studyPipe import __ as _p_
