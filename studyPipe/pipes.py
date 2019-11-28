@@ -1,7 +1,7 @@
 from . import _fun_, _funs_, _funsInv_
 from . import __fun__, __funs__, __funsInv__
 from . import _ftools_
- import warnings
+import warnings
 try:
   import google.colab
   from . import __ as _p_
