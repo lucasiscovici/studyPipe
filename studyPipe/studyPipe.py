@@ -249,7 +249,7 @@ configureStudyPipe(globals(),locals())
 
 #SOURCE: sspipe
 def _resolve(pipe, x, cls=Pipe):
-    while isinstance(pipe, Pipe__):
+    while issubclass(type(pipe),cls): # isinstance(pipe, cls)
         pipe = pipe._____func___(x)
     return pipe
 
