@@ -670,7 +670,22 @@ def format_comma(arr):
 
 toA=[mapl,zipl,filterl,rangel]
 
-for i in toA:
+from multiprocessing import Pool
+_func = None
+
+def worker_init(func):
+    global _func
+    _func = func
+
+def worker(x):
+    return _func(x)
+
+def mapPar(df,fn):
+    with Pool(None, initializer=worker_init, initargs=(fn,)) as p:
+        return p.map(worker, df)
+# mapPar=addToPipe2(mapPar)
+
+for i in toA+[mapPar]:
     setattr(opy,i.__name__,convert_pipe(_c.curry(i)))
 
 toAA=[enumeratel,enumerate,sorted, join,join_n,join_comma,format_sep,format_n,format_comma]
@@ -708,3 +723,14 @@ for i in lll:
     setattr(opy,i2,lambda self,x,met=met: Pipe.partial(list,met(x)) )
 del ooo
 _ftools_=opy()
+
+def addToPipe(a,partialOK=False):
+    import functools
+    # from studyPipe import c_
+    # from studyPipe.studyPipe import Pipe
+    if partialOK:
+        pipedFn=Pipe(lambda x: c_.partial(a,x),special=True)
+    else:
+        return convert_pipe(_c.curry(a))
+    return functools.update_wrapper(pipedFn,a)
+
